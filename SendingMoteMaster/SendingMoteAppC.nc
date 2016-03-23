@@ -33,18 +33,37 @@
  * @author Dimas Abreu Dutra
  */
 
-#ifndef RSSIDEMOMESSAGES_H__
-#define RSSIDEMOMESSAGES_H__
+#include "RssiDemoMessages.h"
+#include "message.h"
 
-enum {
-  AM_RSSIMSG = 10
-};
+configuration SendingMoteAppC {
+} implementation {
+  components ActiveMessageC, MainC;  
+  components new AMSenderC(AM_RSSIMSG) as RssiMsgSender;
+  components new AMReceiverC(AM_RSSIMSG);
+  components new TimerMilliC() as SendTimer;
 
-typedef nx_struct RssiMsg{
-  nx_int16_t rssi;
-  nx_int8_t senderID;
-  nx_int8_t targetID;
-  nx_int8_t sendingFlag;
-} RssiMsg;
+  components SendingMoteC as App;
+  
+#ifdef __CC2420_H__
+  components CC2420ActiveMessageC;
+  App -> CC2420ActiveMessageC.CC2420Packet;
+#elif  defined(PLATFORM_IRIS)
+  components  RF230ActiveMessageC;
+  App -> RF230ActiveMessageC.PacketRSSI;
+#elif defined(PLATFORM_UCMINI)
+  components  RFA1ActiveMessageC;
+  App -> RFA1ActiveMessageC.PacketRSSI;
+#elif defined(TDA5250_MESSAGE_H)
+  components Tda5250ActiveMessageC;
+  App -> Tda5250ActiveMessageC.Tda5250Packet;
+#endif
 
-#endif //RSSIDEMOMESSAGES_H__
+
+  App.Boot -> MainC;
+  App.SendTimer -> SendTimer;
+  App.Receive -> AMReceiverC;
+  
+  App.RssiMsgSend -> RssiMsgSender;
+  App.RadioControl -> ActiveMessageC;
+}

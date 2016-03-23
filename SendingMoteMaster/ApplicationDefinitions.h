@@ -33,18 +33,11 @@
  * @author Dimas Abreu Dutra
  */
 
-#ifndef RSSIDEMOMESSAGES_H__
-#define RSSIDEMOMESSAGES_H__
+#ifndef APPLICATIONDEFINITIONS_H__
+#define APPLICATIONDEFINITIONS_H__
 
 enum {
-  AM_RSSIMSG = 10
+  SEND_INTERVAL_MS = 250
 };
 
-typedef nx_struct RssiMsg{
-  nx_int16_t rssi;
-  nx_int8_t senderID;
-  nx_int8_t targetID;
-  nx_int8_t sendingFlag;
-} RssiMsg;
-
-#endif //RSSIDEMOMESSAGES_H__
+#endif //APPLICATIONDEFINITIONS_H__
