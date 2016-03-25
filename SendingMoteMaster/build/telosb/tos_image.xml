@@ -1,12 +1,12 @@
 <tos_image>
   <ident>
-    <timestamp>56F2CD5BL</timestamp>
-    <hostname>lukezakr-Mint</hostname>
-    <userhash>6708806AL</userhash>
-    <username>lukezakr</username>
     <deluge_support>no</deluge_support>
+    <userhash>6708806AL</userhash>
     <appname>SendingMoteAppC</appname>
-    <uidhash>9D6F25E3L</uidhash>
+    <timestamp>56F5721AL</timestamp>
+    <uidhash>856EE912L</uidhash>
+    <username>lukezakr</username>
+    <hostname>lukezakr-Mint</hostname>
     <platform>telosb</platform>
   </ident>
   <image format="ihex">

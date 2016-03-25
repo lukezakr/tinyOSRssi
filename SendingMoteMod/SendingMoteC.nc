@@ -91,7 +91,7 @@ module SendingMoteC {
 
   event void SendTimer.fired(){
       RssiMsg* packet = (RssiMsg*) (call RssiMsgSend.getPayload(&message, sizeof (RssiMsg)));
-      if ((packet->senderID == packet->sendingFlag) || (TOS_NODE_ID))
+      if ((packet->senderID == packet->sendingFlag) || (packet->sendingFlag == TOS_NODE_ID))
       {
       packet->senderID = TOS_NODE_ID;
     call RssiMsgSend.send(AM_BROADCAST_ADDR, &message, sizeof(RssiMsg));
