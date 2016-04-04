@@ -44,7 +44,9 @@ typedef nx_struct RssiMsg{
   nx_int16_t rssi;
   nx_int8_t senderID;
   nx_int8_t targetID;
-  nx_int8_t sendingFlag;
+  nx_int8_t activeFlag;
+  nx_int8_t passiveFlag;
+  nx_int8_t changeActiveFlag;
 } RssiMsg;
 
 #endif //RSSIDEMOMESSAGES_H__

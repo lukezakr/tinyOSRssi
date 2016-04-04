@@ -57,18 +57,18 @@ module SendingMoteC {
 } implementation {
   message_t message;
   uint16_t getRssi(message_t *msg);
-  uint16_t totalNodes = 4; //needs to be set to the number of nodes currently being used in the system
-  uint16_t nodecount = 1;
-  uint16_t nodeTracker[20] = {0}; //each space in the array holds a flag for a node in the network, there is space for a max of 20 nodes
-  uint16_t nodeTrackerSum = 0;
-  int i;
+  uint16_t totalNodes = 3; //needs to be set to the number of nodes currently being used in the system
+  uint16_t nodecount = 0;
+  //uint16_t nodeTracker[10] = {0,0,0,0,0,0,0,0,0,0}; //each space in the array holds a flag for a node in the network, there is space for a max of 20 nodes
+  //uint16_t nodeTrackerSum = 0;
+  //int i;
   
   
    event message_t* Receive.receive(message_t *msg1, void *payload, uint8_t len) {
     message_t *ret = msg1;
     RssiMsg *rssiMsg = (RssiMsg*) payload;
-    nodeTracker[(rssiMsg->senderID)-1] = 1; //records that the master node has recieved a packet from each sending node 
-    for (i = 0; i < 19; i++)
+   /* nodeTracker[(rssiMsg->senderID)-1] = 1; //records that the master node has recieved a packet from each sending node 
+    for (i = 0; i < 9; i++)
     {
         nodeTrackerSum = nodeTrackerSum + nodeTracker[i];
     }
@@ -76,13 +76,13 @@ module SendingMoteC {
     if (nodeTrackerSum == totalNodes)
     {
         nodecount = nodecount + 1;
-        for (i = 0; i < 19; i++)
+        for (i = 0; i < 9; i++)
     {
         nodeTracker[i] = 0;
     }
     }
     
-    nodeTrackerSum = 0;
+    nodeTrackerSum = 0;*/
     //rssiMsg->rssi = getRssi(msg1);
     //rssiMsg->targetID = rssiMsg->senderID;
     
@@ -112,8 +112,11 @@ module SendingMoteC {
 
   event void SendTimer.fired(){
       RssiMsg* packet = (RssiMsg*) (call RssiMsgSend.getPayload(&message, sizeof (RssiMsg)));
+      if (nodecount < totalNodes+1){
+          nodecount = nodecount + 1;}
       packet->senderID = TOS_NODE_ID;
       packet->sendingFlag = nodecount;
+      
     call RssiMsgSend.send(AM_BROADCAST_ADDR, &message, sizeof(RssiMsg));    
   }
 

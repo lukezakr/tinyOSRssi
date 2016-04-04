@@ -1,4 +1,4 @@
-/*
+/*  T13 == BaseStation, T6 == Node 1
  * Copyright (c) 2008 Dimas Abreu Dutra
  * All rights reserved
  *
@@ -57,6 +57,13 @@ module SendingMoteC {
 } implementation {
   message_t message;
   uint16_t getRssi(message_t *msg);
+  uint8_t ActiveFlag = 1;
+  uint8_t counter = 1;
+  uint16_t totalNodes = 7;
+  int i;
+  
+  
+  //task void radioSend();
   
   
    event message_t* Receive.receive(message_t *msg1, void *payload, uint8_t len) {
@@ -64,8 +71,45 @@ module SendingMoteC {
     RssiMsg *rssiMsg = (RssiMsg*) payload;
     rssiMsg->rssi = getRssi(msg1);
     rssiMsg->targetID = rssiMsg->senderID;
+    ActiveFlag = rssiMsg->activeFlag;
+    counter = rssiMsg->passiveFlag;
+    
+    if (rssiMsg->activeFlag == TOS_NODE_ID)
+    {
+        if (totalNodes == TOS_NODE_ID)
+        {
+            counter = 1;
+            ActiveFlag = 1;
+        }
+        
+        else if (counter == totalNodes)
+        {
+            rssiMsg->changeActiveFlag = 1;
+        }
+        
+        else
+        {
+            counter = counter + 1;
+        }
+    }
+    else
+        if (rssiMsg->changeActiveFlag == 1)
+        {
+            counter = ActiveFlag + 2;
+            ActiveFlag = ActiveFlag + 1;
+            rssiMsg->changeActiveFlag = 0;
+            
+            if (ActiveFlag == totalNodes)
+            {
+               ActiveFlag = 0;
+               counter = 0;
+            }
+        }
+            
     
      message = *ret;
+     //for (i = 0; i < 6000; i++) 
+     //post radioSend();
       return ret;
    }
   
@@ -83,19 +127,33 @@ module SendingMoteC {
   }
 
   event void RadioControl.startDone(error_t result){
-    call SendTimer.startPeriodic(TOS_NODE_ID*25);
+    srand(TOS_NODE_ID);
+    call SendTimer.startPeriodic(500 /*+ (rand() % 100)*/);
   }
 
   event void RadioControl.stopDone(error_t result){}
 
-
-  event void SendTimer.fired(){
-      RssiMsg* packet = (RssiMsg*) (call RssiMsgSend.getPayload(&message, sizeof (RssiMsg)));
+/*task void radioSend() {
+   // for (i = 0; i < 400; i++) 
+    RssiMsg* packet = (RssiMsg*) (call RssiMsgSend.getPayload(&message, sizeof (RssiMsg)));
       if ((packet->senderID == packet->sendingFlag) || (packet->sendingFlag == TOS_NODE_ID))
       {
       packet->senderID = TOS_NODE_ID;
     call RssiMsgSend.send(AM_BROADCAST_ADDR, &message, sizeof(RssiMsg));
-      }    
+      }  
+}*/
+
+
+  event void SendTimer.fired(){
+      RssiMsg* packet = (RssiMsg*) (call RssiMsgSend.getPayload(&message, sizeof (RssiMsg)));
+      if ((ActiveFlag == TOS_NODE_ID) || (counter == TOS_NODE_ID))
+      {
+      packet->senderID = TOS_NODE_ID;
+      packet->activeFlag = ActiveFlag;
+      packet->passiveFlag = counter;
+    call RssiMsgSend.send(AM_BROADCAST_ADDR, &message, sizeof(RssiMsg));
+      }
+      
   }
 
   event void RssiMsgSend.sendDone(message_t *m, error_t error){}
@@ -105,7 +163,7 @@ module SendingMoteC {
     return (uint16_t) call CC2420Packet.getRssi(msg);
   }
 #elif defined(CC1K_RADIO_MSG_H)
-    uint16_t getRssi(message_t *msg){
+    uint16_t getRssi(mecounter = ActiveFlag + 2;ssage_t *msg){
     cc1000_metadata_t *md =(cc1000_metadata_t*) msg->metadata;
     return md->strength_or_preamble;
   }
