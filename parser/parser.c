@@ -8,8 +8,8 @@ int main(){
 	FILE *ofp;
 	FILE *rfp;
 
-	char outputf[256];
-	char rssidumpf[256];
+	char outputf[128] = {0};
+	char rssidumpf[128] = {0};
 	char indexf[3];
 
 	scanf("%s", indexf);
@@ -17,18 +17,18 @@ int main(){
 	strcat(outputf, indexf);
 	strcat(outputf,".txt");
 
-	strcat(rssidumpf, "../rssiDump");
-	strcat(rssidumpf, indexf);
-	strcat(rssidumpf,".txt");
+	//strcat(rssidumpf, "../rssiDump");
+	//strcat(rssidumpf, indexf);
+	//strcat(rssidumpf,".txt");
 
 	//ifp = fopen("../output%s.txt", "r");
 	ifp = fopen(outputf, "r");
 	ofp = fopen("../charStringOutput01.txt","w");
 	//rfp = fopen("../rssiDump01.txt","w");
-	rfp = fopen(rssidumpf,"w");
+	rfp = fopen("../rssiDump006.txt","w");
 
 	//raw character string to hold parsed text from java Listen output
-	char cdata[65536];
+	char cdata[6553600];
 	//array to hold all 400 possible edge combinations, and associated information
 	rssi rdata[20][20];
 	
@@ -128,6 +128,9 @@ int rem_buffer(char* cdata)
 			cdata[m] = cdata[n];
 			++n;
 			++m;
+		}
+		for(int i = 0; i < 2; ++i){
+			++n;
 		}
 	}
 

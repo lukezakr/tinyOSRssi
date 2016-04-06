@@ -4,7 +4,7 @@
 typedef struct {
 	int smote; 		//sending mote id
 	int rmote;		//receiving mote id
-	int rvals[256]; 	//rssi data values
+	int rvals[4096]; 	//rssi data values
 	int counter;
 	int set;		//1 = atleast 1 rssi value was taken, 0 = none were taken
 	float avgrssi;	//average rssi value
