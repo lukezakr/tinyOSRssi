@@ -124,6 +124,10 @@ module SendingMoteC {
   
   event void Boot.booted(){
     call RadioControl.start();
+    /*if (TOS_NODE_ID == 1)
+    {
+        counter = 2;
+    }*/
   }
 
   event void RadioControl.startDone(error_t result){
