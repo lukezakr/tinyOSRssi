@@ -40,7 +40,7 @@
 module SendingMoteC {
   uses interface Boot;
   uses interface Timer<TMilli> as SendTimer;
-  uses interface Intercept as RssiMsgIntercept;
+  
   
   uses interface AMSend as RssiMsgSend;
   uses interface Receive;
@@ -59,7 +59,7 @@ module SendingMoteC {
   uint16_t getRssi(message_t *msg);
   uint8_t ActiveFlag = 1;
   uint8_t counter = 1;
-  uint16_t totalNodes = 7;
+  uint16_t totalNodes = 5;
   int i;
   
   
@@ -113,14 +113,7 @@ module SendingMoteC {
       return ret;
    }
   
-  event bool RssiMsgIntercept.forward(message_t *msg1,
-                      void *payload,
-                      uint8_t len) {
-    RssiMsg *rssiMsg = (RssiMsg*) payload;
-    rssiMsg->rssi = 43981;
-    
-    return TRUE;
-  }
+
   
   event void Boot.booted(){
     call RadioControl.start();
@@ -132,7 +125,7 @@ module SendingMoteC {
 
   event void RadioControl.startDone(error_t result){
     srand(TOS_NODE_ID);
-    call SendTimer.startPeriodic(500 /*+ (rand() % 100)*/);
+    call SendTimer.startPeriodic(SEND_INTERVAL_MS);
   }
 
   event void RadioControl.stopDone(error_t result){}
