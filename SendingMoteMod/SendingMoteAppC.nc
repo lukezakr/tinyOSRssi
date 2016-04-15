@@ -38,7 +38,7 @@
 
 configuration SendingMoteAppC {
 } implementation {
-  components ActiveMessageC, MainC;  
+  components ActiveMessageC, MainC, LedsC;  
   components new AMSenderC(AM_RSSIMSG) as RssiMsgSender;
   components new AMReceiverC(AM_RSSIMSG);
   components new TimerMilliC() as SendTimer;
@@ -66,4 +66,5 @@ configuration SendingMoteAppC {
   
   App.RssiMsgSend -> RssiMsgSender;
   App.RadioControl -> ActiveMessageC;
+  App.Leds-> LedsC;
 }

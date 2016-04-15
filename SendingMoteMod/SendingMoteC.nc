@@ -40,6 +40,7 @@
 module SendingMoteC {
   uses interface Boot;
   uses interface Timer<TMilli> as SendTimer;
+  uses interface Leds;
   
   
   uses interface AMSend as RssiMsgSend;
@@ -58,7 +59,7 @@ module SendingMoteC {
   message_t message;
   uint16_t getRssi(message_t *msg);
   uint8_t ActiveFlag = 1;
-  uint8_t counter = 1;
+  uint8_t counter = 2;
   uint16_t totalNodes = 5;
   int i;
   
@@ -67,13 +68,15 @@ module SendingMoteC {
   
   
    event message_t* Receive.receive(message_t *msg1, void *payload, uint8_t len) {
+    
     message_t *ret = msg1;
     RssiMsg *rssiMsg = (RssiMsg*) payload;
     rssiMsg->rssi = getRssi(msg1);
     rssiMsg->targetID = rssiMsg->senderID;
     ActiveFlag = rssiMsg->activeFlag;
     counter = rssiMsg->passiveFlag;
-    
+    call Leds.led0On();
+    call Leds.led1Off();
     if (rssiMsg->activeFlag == TOS_NODE_ID)
     {
         if (totalNodes == TOS_NODE_ID)
@@ -149,6 +152,9 @@ module SendingMoteC {
       packet->activeFlag = ActiveFlag;
       packet->passiveFlag = counter;
     call RssiMsgSend.send(AM_BROADCAST_ADDR, &message, sizeof(RssiMsg));
+      
+      call Leds.led0Off();
+    call Leds.led1On();
       }
       
   }
