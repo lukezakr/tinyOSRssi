@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include "parser.h"
 
 int main(){
@@ -7,28 +6,12 @@ int main(){
 	FILE *ifp;
 	FILE *ofp;
 	FILE *rfp;
-
-	char outputf[128] = {0};
-	char rssidumpf[128] = {0};
-	char indexf[3];
-
-	scanf("%s", indexf);
-	strcat(outputf, "../output");
-	strcat(outputf, indexf);
-	strcat(outputf,".txt");
-
-	//strcat(rssidumpf, "../rssiDump");
-	//strcat(rssidumpf, indexf);
-	//strcat(rssidumpf,".txt");
-
-	//ifp = fopen("../output%s.txt", "r");
-	ifp = fopen(outputf, "r");
-	ofp = fopen("../charStringOutput01.txt","w");
-	//rfp = fopen("../rssiDump01.txt","w");
-	rfp = fopen("../rssiDump006.txt","w");
+	ifp = fopen("../output00.txt", "r");
+	ofp = fopen("../charStringOutput00.txt","w");
+	rfp = fopen("../rssiDump.txt","w");
 
 	//raw character string to hold parsed text from java Listen output
-	char cdata[6553600];
+	char cdata[65536];
 	//array to hold all 400 possible edge combinations, and associated information
 	rssi rdata[20][20];
 	
@@ -42,16 +25,14 @@ int main(){
 	int size = rem_whitespace(ifp, cdata);
 	size = rem_buffer(cdata);
 
-	//dump raw character data into output file
-	for(int i = 0; i < size - 1; ++i){
-		putc(cdata[i], ofp);
-	}
 
 	//initalize the 400 element array
 	init_rdata(rdata);
 
 	//extract rssi data from cdata and dump into rdata
 	cdata_to_rdata(cdata, rdata);
+	//change rssi decibel values to corresponding distance values
+	decibel_to_distance(rdata);
 	//print all avg rssi values from edges that hold rssi values
 	printf("\n");
 	for(int i = 0; i < 20; ++i){
@@ -59,7 +40,7 @@ int main(){
 			if(rdata[i][j].set == 1){
 				printf("R = %2d, ", rdata[i][j].rmote);
 				printf("S = %2d, ", rdata[i][j].smote);
-				printf("Avg = %f\n", rdata[i][j].avgrssi);
+				printf("Avg = %0.1f\n", rdata[i][j].avgrssi);
 			}
 		}
 	}
@@ -69,7 +50,7 @@ int main(){
 			if(rdata[i][j].set == 1){
 				fprintf(rfp, "R = %2d, ", rdata[i][j].rmote);
 				fprintf(rfp, "S = %2d, ", rdata[i][j].smote);
-				fprintf(rfp, "Avg = %f\n", rdata[i][j].avgrssi);
+				fprintf(rfp, "Avg = %0.1f\n", rdata[i][j].avgrssi);
 				for(int k = 0; k < rdata[i][j].counter; ++k){
 					fprintf(rfp, "\t%2d", rdata[i][j].rvals[k]);
 					if((k % 5 == 4) && (k < rdata[i][j].counter - 1)){
@@ -81,15 +62,18 @@ int main(){
 		}
 	}
 
-	//print out average of two rssi values between given nodes i and j
+	//data for mapping algorithm
 	for(int i = 0; i < 20; ++i){
-		for(int j = 0; j < i; ++j){
-			if((rdata[i][j].set == 1) && (rdata[j][i].set == 1)){
-				float average = ((float) rdata[i][j].avgrssi + (float) rdata[j][i].avgrssi) / 2;
-				printf("Avg. of %2d %2d: %f\n", i, j, average);
+		for(int j = 0; j < 20; ++j){
+			if(rdata[i][j].set == 1){
+				fprintf(ofp, "%2d, ", rdata[i][j].rmote);
+				fprintf(ofp, "%2d, ", rdata[i][j].smote);
+				fprintf(ofp, "%2d\n", rdata[i][j].dist);
 			}
 		}
 	}
+	fprintf(ofp, "$", rdata[i][j].dist);
+
 
 	fclose(ifp);
 	fclose(ofp);
@@ -128,9 +112,6 @@ int rem_buffer(char* cdata)
 			cdata[m] = cdata[n];
 			++n;
 			++m;
-		}
-		for(int i = 0; i < 2; ++i){
-			++n;
 		}
 	}
 
@@ -219,6 +200,70 @@ void cdata_to_rdata(char* cdata, rssi rdata[20][20])
 			}
 			rdata[i][j].avgrssi = (float) total/ (float) rdata[i][j].counter;
 			total = 0;
+		}
+	}
+	return;
+}
+
+void decibel_to_distance(rssi rdata[20][20])
+{
+	int rssiDecibel;
+	for(int i = 0; i < 20; ++i){
+		for(int j = 0; j < 20; ++j){
+			rssiDecibel = (int) (rdata[i][j].avgrssi + 0.5);
+			switch(rssiDecibel){
+				case 42:
+					rdata[i][j].dist = 1;
+					break;
+				case 34:
+					rdata[i][j].dist = 2;
+					break;
+				case 28:
+					rdata[i][j].dist = 3;
+					break;
+				case 24:
+					rdata[i][j].dist = 4;
+					break;
+				case 18:
+					rdata[i][j].dist = 5;
+					break;
+				case 14:
+					rdata[i][j].dist = 7;
+					break;
+				case 8:
+					rdata[i][j].dist = 8;
+					break;
+				case 3:
+					rdata[i][j].dist = 9;
+					break;
+				case 1:
+					rdata[i][j].dist = 10;
+					break;
+				case -1:
+					rdata[i][j].dist = 11;
+					break;
+				case -5:
+					rdata[i][j].dist = 12;
+					break;
+				case -4:
+					rdata[i][j].dist = 13;
+					break;
+				case -8:
+					rdata[i][j].dist = 14;
+					break;
+				case -13:
+					rdata[i][j].dist = 15;
+					break;
+				case -11:
+					rdata[i][j].dist = 16;
+					break;
+				case -12:
+					rdata[i][j].dist = 17;
+					break;
+				default:
+					rdata[i][j].dist = 256;
+					break;
+			}
 		}
 	}
 	return;
