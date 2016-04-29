@@ -5,33 +5,10 @@
 int main(){
 	//input and output files
 	FILE *ifp;
-	FILE *ofp;
 	FILE *rfp;
 
 	ifp = fopen("../output001.txt", "r");
-	ofp = fopen("../charStringOutput001.txt","w");
 	rfp = fopen("../parsedOutput001.txt","w");
-
-	/*
-	char outputf[32];
-	char rssidumpf[32];
-	char indexf[3];
-
-	scanf("%s", indexf);
-	strcat(outputf, "../output");
-	strcat(outputf, indexf);
-	strcat(outputf,".txt");
-
-	strcat(rssidumpf, "../rssiDump");
-	strcat(rssidumpf, indexf);
-	strcat(rssidumpf,".txt");
-
-	//ifp = fopen("../output%s.txt", "r");
-	ifp = fopen(outputf, "r");
-	ofp = fopen("../charStringOutput01.txt","w");
-	//rfp = fopen("../rssiDump01.txt","w");
-	rfp = fopen(rssidumpf,"w");
-	*/
 
 	//raw character string to hold parsed text from java Listen output
 	char cdata[65536];
@@ -48,43 +25,12 @@ int main(){
 	int size = rem_whitespace(ifp, cdata);
 	size = rem_buffer(cdata);
 
-
 	//initalize the 400 element array
 	init_rdata(rdata);
-
 	//extract rssi data from cdata and dump into rdata
 	cdata_to_rdata(cdata, rdata);
 	//change rssi decibel values to corresponding distance values
 	decibel_to_distance(rdata);
-	//print all avg rssi values from edges that hold rssi values
-	printf("\n");
-	for(int i = 0; i < 20; ++i){
-		for(int j = 0; j < 20; ++j){
-			if(rdata[i][j].set == 1){
-				printf("R = %2d, ", rdata[i][j].rmote);
-				printf("S = %2d, ", rdata[i][j].smote);
-				printf("Avg = %0.1f\n", rdata[i][j].avgrssi);
-			}
-		}
-	}
-	/*
-	for(int i = 0; i < 20; ++i){
-		for(int j = 0; j < 20; ++j){
-			if(rdata[i][j].set == 1){
-				fprintf(rfp, "R = %2d, ", rdata[i][j].rmote);
-				fprintf(rfp, "S = %2d, ", rdata[i][j].smote);
-				fprintf(rfp, "Avg = %0.1f\n", rdata[i][j].avgrssi);
-				for(int k = 0; k < rdata[i][j].counter; ++k){
-					fprintf(rfp, "\t%2d", rdata[i][j].rvals[k]);
-					if((k % 5 == 4) && (k < rdata[i][j].counter - 1)){
-						fprintf(rfp, "\n");
-					}
-				}
-				fprintf(rfp, "\n");
-			}
-		}
-	}
-	*/
 
 	//data for mapping algorithm
 	for(int i = 0; i < 20; ++i){
@@ -99,19 +45,8 @@ int main(){
 			}
 		}
 	}
-	for(int i = 0; i < 20; ++i){
-		for(int j = 0; j < i; ++j){
-			if((rdata[i][j].set == 1) && (rdata[j][i].set == 1)){
-				float average = ((float) rdata[i][j].avgrssi + (float) rdata[j][i].avgrssi) / 2;
-				printf("Avg. of %2d %2d: %f\n", i, j, average);
-			}
-		}
-	}
-	fprintf(ofp, "$");
-
 
 	fclose(ifp);
-	fclose(ofp);
 	fclose(rfp);
 
 	return 0;
