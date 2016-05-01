@@ -1,13 +1,13 @@
 <tos_image>
   <ident>
     <appname>SendingMoteAppC</appname>
-    <username>root</username>
-    <platform>telosb</platform>
-    <deluge_support>no</deluge_support>
-    <timestamp>571129A7L</timestamp>
-    <uidhash>7F39A9DAL</uidhash>
-    <hostname>lukezakr-Mint</hostname>
     <userhash>DC3CE0CDL</userhash>
+    <platform>telosb</platform>
+    <hostname>lukezakr-Mint</hostname>
+    <username>root</username>
+    <timestamp>571A5CA1L</timestamp>
+    <uidhash>6DAF2BE3L</uidhash>
+    <deluge_support>no</deluge_support>
   </ident>
   <image format="ihex">
 :104000005542200135D0085A82456A1231400039A4
@@ -731,7 +731,7 @@
 :106CE000E065A666D866FE6624619261CE61106298
 :106CF0006C620000100050009000D000F000009C7A
 :026D0000020887
-:106D02000500020101FFFFFF2200010001FFFFFF5A
+:106D02000600020101FFFFFF2200010001FFFFFF59
 :0C6D12000100020012A2010001000000BC
 :10FFE0000C45B0680C450C45BE67546736670C4538
 :10FFF000BA695E690C450C4598677A670C45004004

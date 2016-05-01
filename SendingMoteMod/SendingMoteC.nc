@@ -60,7 +60,7 @@ module SendingMoteC {
   uint16_t getRssi(message_t *msg);
   uint8_t ActiveFlag = 1;
   uint8_t counter = 2;
-  uint16_t totalNodes = 5;
+  uint16_t totalNodes = 6;
   int i;
   
   
